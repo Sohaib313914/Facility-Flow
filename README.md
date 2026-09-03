@@ -1,19 +1,19 @@
-# Maintenance Management System
+# 🔧 Maintenance Management System
 
-A simple maintenance management system built with Python that allows users to report maintenance issues and uses AI to analyze them.
+A simple maintenance management system built with Python. The system allows users to report maintenance issues and uses AI to analyze the reported problem.
 
-The main purpose of this project is to make it easier to record maintenance problems, categorize them, assign a priority, and get an initial recommendation for dealing with the issue.
+The goal of this project is to make maintenance issue reporting easier by automatically categorizing issues, determining their priority, and providing a suggested action.
 
 ## Features
 
 - Report maintenance issues
-- Store issues in a database
-- AI-based issue analysis
+- Store maintenance issues in a database
+- AI-powered issue analysis
 - Automatic issue categorization
 - Automatic priority detection
 - AI-generated issue summary
-- Suggested action for maintenance staff
-- Simple web interface using Streamlit
+- Suggested maintenance action
+- Simple and user-friendly Streamlit interface
 
 ## Technologies Used
 
@@ -22,18 +22,18 @@ The main purpose of this project is to make it easier to record maintenance prob
 - Supabase
 - PostgreSQL
 - Google Gemini API
-- Git & GitHub
+- Git
+- GitHub
 
 ## How It Works
 
-The basic workflow of the system is:
-
-1. User enters the maintenance issue.
+1. The user enters the maintenance issue.
 2. The issue title and description are sent to the AI.
-3. Gemini analyzes the issue.
-4. The system gets information such as category and priority.
-5. The issue and AI results are stored in Supabase.
-6. The result is shown to the user through the Streamlit interface.
+3. Google Gemini analyzes the issue.
+4. The AI determines the category and priority.
+5. The AI generates a short summary and suggested action.
+6. The issue and AI results are stored in Supabase.
+7. The results are displayed in the Streamlit application.
 
 ## Project Structure
 
