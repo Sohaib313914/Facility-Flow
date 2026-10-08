@@ -2,6 +2,7 @@ import os
 import json
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 
 load_dotenv()
 
@@ -9,7 +10,7 @@ client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
 
-MODEL = "gemini-3.6-flash"
+MODEL = "gemini-3.5-flash-lite"
 
 
 def analyze_issue(title, description):
@@ -25,7 +26,7 @@ Issue Title:
 Description:
 {description}
 
-Return ONLY valid JSON using exactly these four fields:
+Return a JSON object with exactly these four fields:
 
 {{
     "category": "string",
@@ -41,22 +42,16 @@ Priority rules:
 - LOW: minor issue with little operational impact
 - MEDIUM: issue affects normal operation but is not critical
 - HIGH: safety risk, major equipment failure, or serious disruption
-
-Do not add markdown.
-Do not add explanations outside the JSON.
 """
 
     response = client.models.generate_content(
         model=MODEL,
-        contents=prompt
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json"
+        )
     )
 
     result = response.text.strip()
-
-    # Remove markdown code fences if Gemini adds them
-    if result.startswith("```"):
-        result = result.replace("```json", "")
-        result = result.replace("```", "")
-        result = result.strip()
 
     return json.loads(result)
