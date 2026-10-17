@@ -33,10 +33,10 @@ from utils.logic import (
 )
 
 # Sidebar navigation
-NAV_DASHBOARD = "📊  Dashboard"
-NAV_ISSUES = "📋  Issues"
-NAV_REPORT = "➕  Report Issue"
-NAV_ANALYTICS = "📈  Analytics"
+NAV_DASHBOARD = "  Dashboard"
+NAV_ISSUES = "  Issues"
+NAV_REPORT = "  Report Issue"
+NAV_ANALYTICS = "  Analytics"
 NAV_OPTIONS = [NAV_DASHBOARD, NAV_ISSUES, NAV_REPORT, NAV_ANALYTICS]
 
 # Columns shown in the issue tables
@@ -285,31 +285,31 @@ def page_issues(issues, error):
         c1, c2, c3, c4, c5 = st.columns(5)
         with c1:
             category_filter = st.selectbox(
-                "📂 Category",
+                " Category",
                 ["All"] + filter_options(issues, "category"),
                 key=FILTER_KEYS["category"]
             )
         with c2:
             priority_filter = st.selectbox(
-                "⚡ Priority",
+                " Priority",
                 ["All"] + filter_options(issues, "priority", PRIORITIES),
                 key=FILTER_KEYS["priority"]
             )
         with c3:
             status_filter = st.selectbox(
-                "📌 Status",
+                " Status",
                 ["All"] + filter_options(issues, "status", STATUS_OPTIONS),
                 key=FILTER_KEYS["status"]
             )
         with c4:
             department_filter = st.selectbox(
-                "🏢 Department",
+                " Department",
                 ["All"] + filter_options(issues, "department"),
                 key=FILTER_KEYS["department"]
             )
         with c5:
             technician_filter = st.selectbox(
-                "👷 Technician",
+                " Technician",
                 ["All"] + filter_options(issues, "assigned_to", TECHNICIANS),
                 key=FILTER_KEYS["technician"]
             )
@@ -372,7 +372,7 @@ def page_issues(issues, error):
 
     # --- Description ---
     with st.container(border=True):
-        theme.render('<div class="mm-panel-title">📝 Description</div>')
+        theme.render('<div class="mm-panel-title"> Description</div>')
         theme.render(theme.text_block(
             display_value(description_raw, "No description provided."),
             empty_hint=not str(description_raw or "").strip()
@@ -394,7 +394,7 @@ def page_issues(issues, error):
 
         # Assign Technician
         with manage_col1:
-            theme.render('<div class="mm-panel-title">👷 Assign Technician</div>')
+            theme.render('<div class="mm-panel-title"> Assign Technician</div>')
 
             technician_options, technician_index = ensure_option(
                 TECHNICIANS, resolve_technician(detail)
@@ -411,14 +411,14 @@ def page_issues(issues, error):
                     repository.update_issue(supabase, selected_id, {
                         "assigned_to": None if new_technician == UNASSIGNED else new_technician
                     })
-                    st.session_state["flash"] = "✅ Technician assigned successfully!"
+                    st.session_state["flash"] = " Technician assigned successfully!"
                     st.rerun()
                 except Exception as e:
                     st.error(f"❌ Failed to assign technician: {e}")
 
         # Update Status
         with manage_col2:
-            theme.render('<div class="mm-panel-title">🔄 Update Status</div>')
+            theme.render('<div class="mm-panel-title"> Update Status</div>')
 
             status_options, status_index = ensure_option(STATUS_OPTIONS, detail.get("status"))
             new_status = st.selectbox(
@@ -618,7 +618,7 @@ with st.sidebar:
         )
 
     st.write("")
-    st.button("🔄  Refresh data", width="stretch")
+    st.button("  Refresh data", width="stretch")
 
     theme.render(
         f'<div class="mm-side-foot">Analysis model<br><code>{theme.esc(MODEL)}</code></div>'
