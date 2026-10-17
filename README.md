@@ -1,169 +1,111 @@
-# FacilityFlow — AI-Assisted Maintenance Management System
+# FacilityFlow
 
-FacilityFlow is a web-based maintenance management application built with Python and Streamlit. It helps organize maintenance requests, analyze reported issues using Google Gemini AI, track issue progress, and monitor maintenance activity through a dashboard.
+FacilityFlow is a facility maintenance management system built with Python and Streamlit. The system allows users to report maintenance issues and uses AI to analyze the reported problem.
 
-The goal of FacilityFlow is to make maintenance reporting and tracking more organized by providing AI-assisted issue analysis, centralized issue management, and useful analytics in one place.
+The goal of this project is to make maintenance issue reporting easier by automatically categorizing issues, determining their priority, and providing a suggested action.
 
 ## Features
 
-### Maintenance Issue Reporting
-- Submit maintenance issues with a title, description, and location.
-- Analyze reported problems using Google Gemini AI.
-- Generate suggested categories, priority levels, summaries, and recommended actions.
-
-### AI-Assisted Analysis
-- Uses the Google Gemini API to analyze maintenance issue details.
-- Provides an AI-generated issue summary and suggested action.
-- Validates AI responses before using the analysis.
-
-### Issue Management
-- View and manage maintenance issues in one place.
-- Search issues by title, description, and location.
-- Filter issues using available categories, priorities, statuses, departments, and technicians.
-- Assign technicians and update issue statuses.
-- Track issues through Open, In Progress, and Resolved states.
-
-### Dashboard & Analytics
-- View key maintenance metrics.
-- Monitor open, high-priority, and resolved issues.
-- Visualize issue distribution using charts.
-- Review maintenance activity and progress.
-
-### Error Handling & Testing
-- Handles database and AI-related errors.
-- Includes automated tests for important application functionality.
-- Supports testing of application logic and integrations.
+- Report maintenance issues
+- Store maintenance issues in a database
+- Automated issue analysis with Google Gemini
+- Automatic issue categorization
+- Automatic priority detection
+- Generated issue summary
+- Suggested maintenance action
+- Modern dark SaaS dashboard with sidebar navigation (Dashboard, Issues, Report Issue, Analytics)
+- Metric cards, colour-coded priority/status, searchable and filterable issue table
+- Search by title, description or location; filter by category, priority, status, department and technician (filters combine)
+- Assign technicians and update issue status, with clear success and error messages
+- Analytics charts by category, priority, status and department
 
 ## Technologies Used
 
-- **Python** — Core application logic
-- **Streamlit** — Web application interface
-- **Supabase** — Database service and application data storage
-- **PostgreSQL** — Relational database used by Supabase
-- **Google Gemini API** — AI-assisted issue analysis
-- **Pandas** — Data handling and processing
-- **Plotly** — Interactive charts and visualizations
-- **Pytest** — Automated testing
-- **Git & GitHub** — Version control and source code hosting
+- Python
+- Streamlit
+- Supabase
+- PostgreSQL
+- Google Gemini API
+- Git
+- GitHub
 
 ## How It Works
 
-1. A user submits a maintenance issue through the application.
-2. The application uses Google Gemini to analyze the issue details.
-3. The AI suggests a category, priority, summary, and recommended action.
-4. The application validates the AI response.
-5. The issue and relevant analysis are stored in Supabase.
-6. Users can search, filter, assign, and update maintenance issues.
-7. The dashboard and analytics display an overview of maintenance activity.
+1. The user enters the maintenance issue.
+2. The issue title and description are sent to the AI.
+3. Google Gemini analyzes the issue.
+4. The AI determines the category and priority.
+5. The AI generates a short summary and suggested action.
+6. The issue and AI results are stored in Supabase.
+7. The results are displayed in the Streamlit application.
 
 ## Project Structure
 
 ```text
 FacilityFlow/
-├── assets/                 # Application assets and styling resources
-├── services/               # External service integrations
-│   ├── ai_service.py       # Google Gemini AI integration
-│   └── database.py         # Database connection setup
+│
+├── .streamlit/
+│   └── config.toml        # dark theme settings
+├── assets/
+├── services/
+│   ├── ai_service.py      # Gemini analysis (model: gemini-3.5-flash-lite)
+│   └── database.py        # Supabase client
 ├── utils/
-│   ├── repository.py       # Data access operations
-│   ├── logic.py            # Application logic and calculations
-│   └── theme.py            # UI theme and chart styling
-├── tests/                  # Automated tests
-├── app.py                  # Main Streamlit application
-├── requirements.txt        # Application dependencies
-├── requirements-dev.txt    # Development and testing dependencies
-├── .env.example            # Example environment configuration
-├── .gitignore              # Git exclusion rules
-└── README.md               # Project documentation
+│   ├── logic.py           # pure logic: filters, metrics, department mapping, validation
+│   ├── repository.py      # reads/updates of the existing `issues` table
+│   └── theme.py           # styling and UI components
+├── tests/                 # pytest suite (no credentials needed)
+├── app.py
+├── test_connection.py
+├── test_gemini.py
+├── requirements.txt
+├── .env                   # your credentials (not committed)
+├── .gitignore
+└── README.md
 ```
 
-*Note: The structure above describes the expected organization. Update it if the actual files in your latest project folder differ.*
+## Setup and Run
 
-## Getting Started
+1. Install dependencies:
 
-### Prerequisites
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-- Python 3.10 or a compatible Python version
-- A Supabase project
-- A Google Gemini API key
+2. Create a `.env` file next to `app.py` containing `SUPABASE_URL`, `SUPABASE_KEY` and `GEMINI_API_KEY` (never commit this file).
 
-### 1. Clone the Repository
+3. Start the app:
+
+   ```bash
+   streamlit run app.py
+   ```
+
+Optional checks: `python test_connection.py` (Supabase) and `python test_gemini.py` (Gemini).
+
+## Tests
 
 ```bash
-git clone https://github.com/Sohaib313914/Maintenance-Management-System.git
-cd Maintenance-Management-System
+pip install -r requirements-dev.txt
+python -m pytest
 ```
 
-### 2. Create and Activate a Virtual Environment
+The main suite uses in-memory stand-ins for Supabase and Gemini, so it needs no `.env`.
 
-**Windows PowerShell:**
+`tests/test_integration.py` talks to the real Supabase project and Gemini API. It is skipped
+automatically unless `SUPABASE_URL`, `SUPABASE_KEY` and `GEMINI_API_KEY` are available. It only
+reads data (and makes one small Gemini request); it never inserts, updates or deletes rows.
 
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
+## Behaviour notes
 
-### 3. Install Dependencies
+- An issue is saved only if the Gemini analysis is complete and valid (category, a priority of
+  LOW / MEDIUM / HIGH, summary and suggested action). Otherwise nothing is saved and the error is shown.
+- The department is derived from the category when the issue is created. Older rows without a
+  department are displayed (and filtered, and charted) using the same mapping; the database is not changed.
+- Technicians come from a fixed list in `utils/logic.py`. A technician already stored on an issue
+  stays selectable even if it is not in that list.
 
-```bash
-python -m pip install -r requirements.txt
-```
+## Optional extensions (need extra infrastructure, not implemented)
 
-For development and testing dependencies, run:
+- **Technicians from the database:** requires a new `technicians` table.
+- **Department notifications:** requires an external channel (email, Slack, etc.) and its credentials.
 
-```bash
-python -m pip install -r requirements-dev.txt
-```
-
-### 4. Configure Environment Variables
-
-Create a `.env` file in the project root directory and add your own credentials:
-
-```env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_KEY=your_supabase_key
-GEMINI_API_KEY=your_gemini_api_key
-```
-
-Replace the placeholder values with your own credentials. Never commit your actual API keys or secrets to GitHub.
-
-### 5. Run the Application
-
-```bash
-python -m streamlit run app.py
-```
-
-The application will provide a local URL in the terminal, usually `http://localhost:8501`.
-
-## Running Tests
-
-Run the automated test suite with:
-
-```bash
-python -m pytest -v
-```
-
-Some integration tests may require valid credentials and access to external services. Check the test configuration before running them.
-
-## Security Notes
-
-- Keep your `.env` file private.
-- Never publish API keys, passwords, or database credentials.
-- Use `.env.example` to document the required environment variables without exposing their values.
-- Review `.gitignore` before pushing the project to GitHub.
-
-## Project Goals
-
-FacilityFlow demonstrates the integration of a web application interface, database operations, AI-assisted analysis, issue tracking, and analytics in a single project.
-
-It is also a learning project focused on practical Python development, API integration, database interaction, application testing, and user interface improvement.
-
-## Author
-
-**Sohaib**
-
-GitHub: [Sohaib313914](https://github.com/Sohaib313914)
-
----
-
-*FacilityFlow — Organizing maintenance, one issue at a time.*
